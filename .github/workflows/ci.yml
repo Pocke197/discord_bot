@@ -39,4 +39,4 @@ jobs:
         run: pnpm test
 
       - name: Tests e2e
-        run: pnpm test:e2egit checkout -b feat/ci
+        run: pnpm test:e2e
