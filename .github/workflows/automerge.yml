@@ -1,0 +1,22 @@
+name: Auto-merge mis PRs
+
+on:
+  pull_request:
+    branches: [develop]
+    types: [opened, reopened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.user.login == 'Pocke197' && !github.event.pull_request.draft
+
+    steps:
+      - name: Activar auto-merge (squash)
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
