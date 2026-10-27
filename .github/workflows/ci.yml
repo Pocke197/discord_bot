@@ -9,9 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    defaults:
-      run:
-        working-directory: api
 
     steps:
       - name: Checkout
@@ -27,7 +24,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-          cache-dependency-path: api/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Instalar dependencias
         run: pnpm install --frozen-lockfile
