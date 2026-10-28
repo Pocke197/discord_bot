@@ -5,8 +5,13 @@ WORKDIR /app
 
 # ---------- Etapa 2: compilar ----------
 FROM base AS build
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./ 
 RUN pnpm install --frozen-lockfile
+
+COPY prisma/ ./prisma/
+COPY prisma7.config.ts ./prisma7.config.ts
+RUN pnpm prisma:generate
+
 COPY . .
 RUN pnpm build
 
