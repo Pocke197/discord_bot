@@ -1,2 +1,4 @@
 allowBuilds:
+  '@prisma/engines': false
   necord: false
+  prisma: false
