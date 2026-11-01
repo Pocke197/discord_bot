@@ -6,9 +6,9 @@ import { IntentsBitField } from 'discord.js';
 @Module({
   imports: [
     NecordModule.forRoot({
-        token: process.env.DISCORD_BOT_TOKEN ?? 'YOUR_BOT_TOKEN',
-        intents: [IntentsBitField.Flags.Guilds]
-    })
+      token: process.env.DISCORD_BOT_TOKEN ?? 'YOUR_BOT_TOKEN',
+      intents: [IntentsBitField.Flags.Guilds],
+    }),
   ],
   providers: [DiscordUpdate],
 })
