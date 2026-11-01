@@ -3,8 +3,8 @@ import { On, Once, Context } from 'necord';
 import type { ContextOf } from 'necord';
 
 @Injectable()
-export class AppUpdate {
-    private readonly logger = new Logger(AppUpdate.name);
+export class DiscordUpdate {
+    private readonly logger = new Logger(DiscordUpdate.name);
 
     @Once('clientReady')
     public onReady(@Context() [client]: ContextOf<'clientReady'>): void {
