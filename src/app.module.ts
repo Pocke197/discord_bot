@@ -1,11 +1,7 @@
 import { Module } from '@nestjs/common';
 import { createObserveModule } from '@nestjs/observe';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
-import { AppUpdate} from './app.update.js';
-import { NecordModule } from 'necord';
-import { IntentsBitField } from 'discord.js';
-
+import { DiscordModule } from './discord/discord.module.js';
+import { HealthModule } from './health/health.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -16,12 +12,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       appSecret: process.env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
       serviceId: 'project-name',
     }),
-    NecordModule.forRoot({
-        token: process.env.DISCORD_BOT_TOKEN ?? 'YOUR_BOT_TOKEN',
-        intents: [IntentsBitField.Flags.Guilds]
-    })
+    DiscordModule,
+    HealthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, AppUpdate],
 })
 export class AppModule {}
