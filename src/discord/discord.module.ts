@@ -3,6 +3,7 @@ import { DiscordUpdate } from './discord.update.js';
 import { NecordModule } from 'necord';
 import { IntentsBitField } from 'discord.js';
 import { LevelsModule } from './levels/levels.module.js';
+import { SteamModule } from '../steam/steam.module.js';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { LevelsModule } from './levels/levels.module.js';
       ],
     }),
     LevelsModule,
+    SteamModule,
   ],
   providers: [DiscordUpdate],
 })
