@@ -7,10 +7,15 @@ import { SteamService } from '../steam/steam.service.js';
 @Injectable()
 export class DiscordUpdate {
   private readonly logger = new Logger(DiscordUpdate.name);
-  constructor(private readonly levelsService: LevelsService, private readonly steamService: SteamService) {}
-  
+  constructor(
+    private readonly levelsService: LevelsService,
+    private readonly steamService: SteamService,
+  ) {}
+
   @Once('clientReady')
-  public async onReady(@Context() [client]: ContextOf<'clientReady'>): Promise<void> {
+  public async onReady(
+    @Context() [client]: ContextOf<'clientReady'>,
+  ): Promise<void> {
     this.logger.log(`Bot logged in as ${client.user.username}`);
     // try {
     //   const games = await this.steamService.getOwnedGames('76561199056137475');
