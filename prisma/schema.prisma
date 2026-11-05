@@ -18,6 +18,7 @@ model Guild {
 model User {
   id        String   @id
   createdAt DateTime @default(now())
+  steamId   String?
   members   Member[]
 }
 
