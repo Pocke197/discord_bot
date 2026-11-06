@@ -16,10 +16,12 @@ model Guild {
 }
 
 model User {
-  id        String   @id
-  createdAt DateTime @default(now())
-  steamId   String?
-  members   Member[]
+  id                   String    @id
+  createdAt            DateTime  @default(now())
+  steamId              String?   @unique
+  steamLinkToken       String?   @unique
+  steamLinkRequestedAt DateTime?
+  members              Member[]
 }
 
 model Member {
