@@ -13,22 +13,30 @@ export class SteamAuthService {
     return extractSteamId(openId);
   }
 
-  buildLoginUrl(token: string): string {
-    const baseUrl = 'https://steamcommunity.com/openid/login';
+  private getPublicUrl(): string {
     const publicUrl = process.env.PUBLIC_URL?.replace(/\/+$/, '');
-
     if (!publicUrl) {
       throw new Error(
         'PUBLIC_URL must be configured to build the Steam login URL',
       );
     }
 
-    const returnTo = `${publicUrl}/steam/callback?token=${encodeURIComponent(token)}`;
+    return publicUrl;
+  }
+
+  buildReturnToUrl(token: string): string {
+    const publicUrl = this.getPublicUrl();
+    return `${publicUrl}/steam/callback?token=${encodeURIComponent(token)}`;
+  }
+
+  buildLoginUrl(token: string): string {
+    const baseUrl = 'https://steamcommunity.com/openid/login';
+
     const params = new URLSearchParams({
       'openid.ns': 'http://specs.openid.net/auth/2.0',
       'openid.mode': 'checkid_setup',
-      'openid.return_to': returnTo,
-      'openid.realm': publicUrl,
+      'openid.return_to': this.buildReturnToUrl(token),
+      'openid.realm': this.getPublicUrl(),
       'openid.identity': 'http://specs.openid.net/auth/2.0/identifier_select',
       'openid.claimed_id': 'http://specs.openid.net/auth/2.0/identifier_select',
     });
