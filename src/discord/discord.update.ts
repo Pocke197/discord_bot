@@ -28,24 +28,28 @@ export class DiscordUpdate {
   public async onMessageCreate(
     @Context() [message]: ContextOf<'messageCreate'>,
   ): Promise<void> {
-    if (message.author.bot) return;
+    try {
+      if (message.author.bot) return;
 
-    if (message.guildId) {
-      const leveledUp = await this.levelsService.addXp(
-        message.author.id,
-        message.guildId,
-        10,
-      );
-
-      if (leveledUp) {
-        const newLevel = await this.levelsService.getUserLevel(
+      if (message.guildId) {
+        const leveledUp = await this.levelsService.addXp(
           message.author.id,
           message.guildId,
+          10,
         );
-        await message.reply(
-          `Congratulations ${message.author.username}, you have leveled up to level ${newLevel}!`,
-        );
+
+        if (leveledUp) {
+          const newLevel = await this.levelsService.getUserLevel(
+            message.author.id,
+            message.guildId,
+          );
+          await message.reply(
+            `Congratulations ${message.author.username}, you have leveled up to level ${newLevel}!`,
+          );
+        }
       }
+    } catch (error) {
+      this.logger.error('Error occurred while processing message:', error);
     }
   }
 }
