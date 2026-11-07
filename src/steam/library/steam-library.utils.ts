@@ -39,9 +39,34 @@ const formatLibrary = (games: SteamGame[]): string => {
   return summary + heading + topGamesFormatted.join('\n');
 };
 
+const getCommonGames = (libraries: SteamGame[][]): SteamGame[] => {
+  const userLibraries = libraries.map(
+    (userGames) => new Set(userGames.map((game) => game.appid)),
+  );
+
+  if (userLibraries.length === 0) {
+    return [];
+  }
+
+  const commonAppIds = userLibraries.reduce((common, userSet) => {
+    return new Set([...common].filter((appid) => userSet.has(appid)));
+  });
+
+  const commonGames: SteamGame[] = [];
+  for (const appid of commonAppIds) {
+    const game = libraries[0].find((game) => game.appid === appid);
+    if (game) {
+      commonGames.push(game);
+    }
+  }
+
+  return commonGames;
+};
+
 export {
   getTopGamesByPlaytime,
   notPlayedGames,
   playtimeToHours,
   formatLibrary,
+  getCommonGames,
 };
