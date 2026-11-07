@@ -76,9 +76,9 @@ export class SteamAuthController {
 
     await this.notifierService.notifyUser(
       discordId,
-      `¡Tu cuenta de Steam ha sido vinculada exitosamente!`,
+      'Your Steam account has been linked successfully!',
     );
 
-    return `Cuenta de Steam vinculada, ya podés volver a Discord`;
+    return 'Steam account linked. You can return to Discord.';
   }
 }

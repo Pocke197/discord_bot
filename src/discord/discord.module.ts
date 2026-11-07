@@ -4,7 +4,8 @@ import { NecordModule } from 'necord';
 import { IntentsBitField } from 'discord.js';
 import { LevelsModule } from './levels/levels.module.js';
 import { SteamModule } from '../steam/steam.module.js';
-import { SteamCommands } from './steam.commands.js';
+import { BibliotecaCommands } from './commands/library.commands.js';
+import { SteamLinkCommands } from './commands/steam-link.commands.js';
 import { SteamAuthModule } from '../steam/auth/steam-auth.module.js';
 
 @Module({
@@ -20,6 +21,6 @@ import { SteamAuthModule } from '../steam/auth/steam-auth.module.js';
     SteamModule,
     SteamAuthModule,
   ],
-  providers: [DiscordUpdate, SteamCommands],
+  providers: [DiscordUpdate, BibliotecaCommands, SteamLinkCommands],
 })
 export class DiscordModule {}

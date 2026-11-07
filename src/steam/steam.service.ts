@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-interface SteamGame {
+export interface SteamGame {
   appid: number;
   name: string;
   playtime_forever: number;

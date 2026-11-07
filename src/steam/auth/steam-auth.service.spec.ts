@@ -9,6 +9,7 @@ describe('SteamAuthService', () => {
       upsert: vi.fn(),
       findUnique: vi.fn(),
       update: vi.fn(),
+      updateMany: vi.fn(),
     },
   };
 
@@ -176,6 +177,19 @@ describe('SteamAuthService', () => {
       expect(prisma.user.update).not.toHaveBeenCalled();
     });
 
+    it('rejects a valid token for a user with an existing Steam ID', async () => {
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'u1',
+        steamId: '76561198111111111',
+        steamLinkRequestedAt: new Date(Date.now() - 5000),
+      });
+
+      await expect(service.completeLink('x', steamId)).rejects.toThrow(
+        'This user already has a linked Steam account',
+      );
+      expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+
     it('rejects an expired token', async () => {
       prisma.user.findUnique.mockResolvedValue({
         id: 'u1',
@@ -267,6 +281,43 @@ describe('SteamAuthService', () => {
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
         where: { id: 'user-1' },
         select: { steamId: true },
+      });
+    });
+  });
+
+  describe('isSteamIdLinked', () => {
+    it('returns false when the user does not exist', async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      await expect(service.isSteamIdLinked('user-1')).resolves.toBe(false);
+    });
+
+    it('returns false for a user without a linked Steam account', async () => {
+      prisma.user.findUnique.mockResolvedValue({ steamId: null });
+
+      await expect(service.isSteamIdLinked('user-1')).resolves.toBe(false);
+    });
+
+    it('returns true for a user with a linked Steam account', async () => {
+      prisma.user.findUnique.mockResolvedValue({
+        steamId: '76561198000000000',
+      });
+
+      await expect(service.isSteamIdLinked('user-1')).resolves.toBe(true);
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        select: { steamId: true },
+      });
+    });
+  });
+
+  describe('unlinkSteamId', () => {
+    it('clears the Steam ID for the user', async () => {
+      await service.unlinkSteamId('user-1');
+
+      expect(prisma.user.updateMany).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: { steamId: null },
       });
     });
   });
