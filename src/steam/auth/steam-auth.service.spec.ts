@@ -237,4 +237,38 @@ describe('SteamAuthService', () => {
       );
     });
   });
+
+  describe('getUserSteamId', () => {
+    it('returns null when the user does not exist', async () => {
+      prisma.user.findUnique.mockResolvedValue(null);
+
+      const steamId = await service.getUserSteamId('user-1');
+
+      expect(steamId).toBeNull();
+    });
+
+    it('returns null for a user without a linked account', async () => {
+      prisma.user.findUnique.mockResolvedValue({
+        steamId: null,
+      });
+
+      const steamId = await service.getUserSteamId('user-1');
+
+      expect(steamId).toBeNull();
+    });
+
+    it('returns the Steam ID for a user with a linked account', async () => {
+      prisma.user.findUnique.mockResolvedValue({
+        steamId: '76561198000000000',
+      });
+
+      const steamId = await service.getUserSteamId('user-1');
+      expect(steamId).toBe('76561198000000000');
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        select: { steamId: true },
+      });
+    });
+
+  });
 });
