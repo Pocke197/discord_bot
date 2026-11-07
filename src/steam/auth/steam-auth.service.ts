@@ -131,4 +131,12 @@ export class SteamAuthService {
       throw error;
     }
   }
+
+  async getUserSteamId(userId: string): Promise<string | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { steamId: true },
+    });
+    return user?.steamId ?? null;
+  }
 }
