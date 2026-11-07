@@ -25,7 +25,7 @@ export class SteamCommands {
     } catch (error) {
       const errorName = error instanceof Error ? error.name : 'UnknownError';
 
-      console.error('Error creating link token:', error);
+      console.error('Error creating link token:', errorName);
 
       return interaction.reply({
         content: 'Failed to create Steam login URL. Please try again later.',

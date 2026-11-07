@@ -6,12 +6,17 @@ import {
   Query,
 } from '@nestjs/common';
 import { SteamAuthService } from './steam-auth.service.js';
+import { NotifierService } from '../../notifier/notifier.service.js';
 import constants from '../../constants.js';
+
 @Controller('steam')
 export class SteamAuthController {
   private readonly logger = new Logger(SteamAuthController.name);
 
-  constructor(private steamAuth: SteamAuthService) {}
+  constructor(
+    private steamAuth: SteamAuthService,
+    private notifierService: NotifierService,
+  ) {}
 
   @Get('callback')
   async handleSteamCallback(
@@ -51,8 +56,10 @@ export class SteamAuthController {
       );
     }
 
+    let discordId: string | null = null;
+
     try {
-      await this.steamAuth.completeLink(token, steamId);
+      discordId = await this.steamAuth.completeLink(token, steamId);
     } catch (error) {
       const errorName = error instanceof Error ? error.name : 'UnknownError';
 
@@ -66,6 +73,11 @@ export class SteamAuthController {
       this.logger.error('Failed to complete Steam link', errorName);
       throw new BadRequestException('Failed to complete Steam link');
     }
+
+    await this.notifierService.notifyUser(
+      discordId,
+      `¡Tu cuenta de Steam ha sido vinculada exitosamente!`,
+    );
 
     return `Cuenta de Steam vinculada, ya podés volver a Discord`;
   }
