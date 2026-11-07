@@ -269,6 +269,5 @@ describe('SteamAuthService', () => {
         select: { steamId: true },
       });
     });
-
   });
 });

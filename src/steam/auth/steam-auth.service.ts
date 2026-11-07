@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { extractSteamId } from './steam-auth.utils.js';
 import { PrismaService } from '../../database/prisma.service.js';
 import { randomBytes } from 'node:crypto';
@@ -7,6 +7,7 @@ import { Prisma } from '../../generated/prisma/client.js';
 
 @Injectable()
 export class SteamAuthService {
+  private readonly logger = new Logger(SteamAuthService.name);
   constructor(private prisma: PrismaService) {}
 
   getSteamIdFromOpenId(openId: string): string | null {
@@ -30,7 +31,7 @@ export class SteamAuthService {
   }
 
   buildLoginUrl(token: string): string {
-    console.log('Building Steam login URL with token:', token);
+    this.logger.log('Building Steam login URL with token:', token);
 
     const baseUrl = 'https://steamcommunity.com/openid/login';
 
@@ -82,7 +83,7 @@ export class SteamAuthService {
       return false;
     }
 
-    console.log('Steam OpenID verification response status:', response.status);
+    this.logger.log('Steam OpenID verification response status:', response.status);
 
     const text = await response.text();
     return text.includes('is_valid:true');
