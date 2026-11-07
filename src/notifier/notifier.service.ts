@@ -12,7 +12,7 @@ export class NotifierService {
 
       return true;
     } catch (error) {
-      const errorName =  error instanceof Error ? error.name : 'UnknownError'
+      const errorName = error instanceof Error ? error.name : 'UnknownError';
       console.error(`Failed to notify user with ID ${userId}:`, errorName);
     }
     return false;

@@ -74,7 +74,7 @@ export class SteamAuthController {
       throw new BadRequestException('Failed to complete Steam link');
     }
 
-    this.notifierService.notifyUser(
+    await this.notifierService.notifyUser(
       discordId,
       `¡Tu cuenta de Steam ha sido vinculada exitosamente!`,
     );
