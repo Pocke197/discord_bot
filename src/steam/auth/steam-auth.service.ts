@@ -30,6 +30,8 @@ export class SteamAuthService {
   }
 
   buildLoginUrl(token: string): string {
+    console.log('Building Steam login URL with token:', token);
+    
     const baseUrl = 'https://steamcommunity.com/openid/login';
 
     const params = new URLSearchParams({
@@ -79,6 +81,8 @@ export class SteamAuthService {
     if (!response.ok) {
       return false;
     }
+
+    console.log('Steam OpenID verification response status:', response.status);
 
     const text = await response.text();
     return text.includes('is_valid:true');
