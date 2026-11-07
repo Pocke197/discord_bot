@@ -31,7 +31,7 @@ export class SteamAuthService {
 
   buildLoginUrl(token: string): string {
     console.log('Building Steam login URL with token:', token);
-    
+
     const baseUrl = 'https://steamcommunity.com/openid/login';
 
     const params = new URLSearchParams({
@@ -102,7 +102,7 @@ export class SteamAuthService {
     return token;
   }
 
-  async completeLink(token: string, steamId: string): Promise<void> {
+  async completeLink(token: string, steamId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
       where: { steamLinkToken: token },
     });
@@ -119,6 +119,8 @@ export class SteamAuthService {
         where: { id: user.id },
         data: { steamId, steamLinkToken: null, steamLinkRequestedAt: null },
       });
+
+      return user.id;
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
