@@ -22,15 +22,15 @@ export class SteamLinkCommands {
     const userId = interaction.user.id;
 
     try {
-      const token = await this.steamAuthService.createLinkToken(userId);
-      const authUrl = this.steamAuthService.buildLoginUrl(token);
-
       if (await this.steamAuthService.isSteamIdLinked(userId)) {
         return interaction.reply({
           content: 'You are already logged in to Steam.',
           flags: MessageFlags.Ephemeral,
         });
       }
+
+      const token = await this.steamAuthService.createLinkToken(userId);
+      const authUrl = this.steamAuthService.buildLoginUrl(token);
 
       return interaction.reply({
         content: `Log in to Steam using the following link: ${authUrl}`,
