@@ -17,12 +17,6 @@ export class DiscordUpdate {
     @Context() [client]: ContextOf<'clientReady'>,
   ): Promise<void> {
     this.logger.log(`Bot logged in as ${client.user.username}`);
-    // try {
-    //   const games = await this.steamService.getOwnedGames('76561199056137475');
-    //   this.logger.log(`Fetched ${games.length} games`);
-    // } catch (error) {
-    //   this.logger.error(`... ${error instanceof Error ? error.message : String(error)}`);
-    // }
   }
 
   @On('warn')

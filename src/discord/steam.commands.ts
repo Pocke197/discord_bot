@@ -1,13 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { SteamAuthService } from '../steam/auth/steam-auth.service.js';
 import { Context, SlashCommand } from 'necord';
 import type { SlashCommandContext } from 'necord';
 import { MessageFlags } from 'discord.js';
-import { PrismaService } from '../database/prisma.service.js';
+import { SteamService } from '../steam/steam.service.js';
 
 @Injectable()
 export class SteamCommands {
-  constructor(private steamAuthService: SteamAuthService) {}
+  private readonly logger = new Logger(SteamCommands.name);
+
+  constructor(
+    private steamAuthService: SteamAuthService,
+    private steamService: SteamService,
+  ) {}
 
   @SlashCommand({
     name: 'steam-login',
@@ -26,7 +31,7 @@ export class SteamCommands {
     } catch (error) {
       const errorName = error instanceof Error ? error.name : 'UnknownError';
 
-      console.error('Error creating link token:', errorName);
+      this.logger.error('Error creating link token:', errorName);
 
       return interaction.reply({
         content: 'Failed to create Steam login URL. Please try again later.',
@@ -58,12 +63,45 @@ export class SteamCommands {
       }
     } catch (error) {
       const errorName = error instanceof Error ? error.name : 'UnknownError';
-      console.error('Error fetching user from database:', errorName);
+      this.logger.error('Error fetching user from database:', errorName);
 
       return interaction.reply({
         content:
           'Failed to fetch your Steam login status. Please try again later.',
         flags: MessageFlags.Ephemeral,
+      });
+    }
+  }
+
+  @SlashCommand({
+    name: 'biblioteca',
+    description: 'Check your Steam library',
+  })
+  public async biblioteca(@Context() [interaction]: SlashCommandContext) {
+    const userId = interaction.user.id;
+
+    await interaction.deferReply({});
+
+    try {
+      const steamId = await this.steamAuthService.getUserSteamId(userId);
+
+      if (!steamId) {
+        return interaction.editReply({
+          content:
+            'You are not logged in to Steam. Please use /steam-login first.',
+        });
+      }
+      const games = await this.steamService.getOwnedGames(steamId);
+
+      return interaction.editReply({
+        content: `You own ${games.length} games on Steam.`,
+      });
+    } catch (error) {
+      const errorName = error instanceof Error ? error.name : 'UnknownError';
+      this.logger.error('Error fetching user from database:', errorName);
+
+      return interaction.editReply({
+        content: 'Failed to fetch your Steam library. Please try again later.',
       });
     }
   }
