@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SteamAuthService } from '../steam/auth/steam-auth.service.js';
+import { SteamAuthService } from '../../steam/auth/steam-auth.service.js';
 import { Context, SlashCommand } from 'necord';
 import type { SlashCommandContext } from 'necord';
 import { MessageFlags } from 'discord.js';
-import { SteamService } from '../steam/steam.service.js';
+import { SteamService } from '../../steam/steam.service.js';
 
 @Injectable()
-export class SteamCommands {
-  private readonly logger = new Logger(SteamCommands.name);
+export class SteamLinkCommands {
+  private readonly logger = new Logger(SteamLinkCommands.name);
 
   constructor(
     private steamAuthService: SteamAuthService,
@@ -16,25 +16,34 @@ export class SteamCommands {
 
   @SlashCommand({
     name: 'steam-login',
-    description: 'Login to Steam',
+    description: 'Log in to Steam',
   })
   public async steamLogin(@Context() [interaction]: SlashCommandContext) {
     const userId = interaction.user.id;
+
     try {
       const token = await this.steamAuthService.createLinkToken(userId);
       const authUrl = this.steamAuthService.buildLoginUrl(token);
 
+      if (await this.steamAuthService.isSteamIdLinked(userId)) {
+        return interaction.reply({
+          content: 'You are already logged in to Steam.',
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+
       return interaction.reply({
-        content: `Please login to Steam using the following link: ${authUrl}`,
+        content: `Log in to Steam using the following link: ${authUrl}`,
         flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       const errorName = error instanceof Error ? error.name : 'UnknownError';
 
-      this.logger.error('Error creating link token:', errorName);
+      this.logger.error('Error creating the link token:', errorName);
 
       return interaction.reply({
-        content: 'Failed to create Steam login URL. Please try again later.',
+        content:
+          'Unable to create the Steam login link. Please try again later.',
         flags: MessageFlags.Ephemeral,
       });
     }
@@ -63,45 +72,43 @@ export class SteamCommands {
       }
     } catch (error) {
       const errorName = error instanceof Error ? error.name : 'UnknownError';
-      this.logger.error('Error fetching user from database:', errorName);
+      this.logger.error(
+        'Error fetching the user from the database:',
+        errorName,
+      );
 
       return interaction.reply({
         content:
-          'Failed to fetch your Steam login status. Please try again later.',
+          'Unable to fetch your Steam login status. Please try again later.',
         flags: MessageFlags.Ephemeral,
       });
     }
   }
 
   @SlashCommand({
-    name: 'biblioteca',
-    description: 'Check your Steam library',
+    name: 'steam-logout',
+    description: 'Log out of Steam',
   })
-  public async biblioteca(@Context() [interaction]: SlashCommandContext) {
+  public async steamLogout(@Context() [interaction]: SlashCommandContext) {
     const userId = interaction.user.id;
 
-    await interaction.deferReply({});
-
     try {
-      const steamId = await this.steamAuthService.getUserSteamId(userId);
-
-      if (!steamId) {
-        return interaction.editReply({
-          content:
-            'You are not logged in to Steam. Please use /steam-login first.',
-        });
-      }
-      const games = await this.steamService.getOwnedGames(steamId);
-
-      return interaction.editReply({
-        content: `You own ${games.length} games on Steam.`,
+      await this.steamAuthService.unlinkSteamId(userId);
+      return interaction.reply({
+        content: 'You have been logged out of Steam.',
+        flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       const errorName = error instanceof Error ? error.name : 'UnknownError';
-      this.logger.error('Error fetching user from database:', errorName);
+      this.logger.error(
+        'Error unlinking the Steam ID from the user:',
+        errorName,
+        errorName,
+      );
 
-      return interaction.editReply({
-        content: 'Failed to fetch your Steam library. Please try again later.',
+      return interaction.reply({
+        content: 'Unable to log you out of Steam. Please try again later.',
+        flags: MessageFlags.Ephemeral,
       });
     }
   }

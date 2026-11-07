@@ -31,7 +31,7 @@ export class SteamAuthService {
   }
 
   buildLoginUrl(token: string): string {
-    this.logger.log('Building Steam login URL with token:', token);
+    this.logger.log('Building Steam login URL with token');
 
     const baseUrl = 'https://steamcommunity.com/openid/login';
 
@@ -83,7 +83,10 @@ export class SteamAuthService {
       return false;
     }
 
-    this.logger.log('Steam OpenID verification response status:', response.status);
+    this.logger.log(
+      'Steam OpenID verification response status:',
+      response.status,
+    );
 
     const text = await response.text();
     return text.includes('is_valid:true');
@@ -103,6 +106,14 @@ export class SteamAuthService {
     return token;
   }
 
+  async isSteamIdLinked(userId: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { steamId: true },
+    });
+    return !!user && !!user.steamId;
+  }
+
   async completeLink(token: string, steamId: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
       where: { steamLinkToken: token },
@@ -115,6 +126,11 @@ export class SteamAuthService {
       user.steamLinkRequestedAt.getTime() + constants.STEAM_LINK_TTL_MS
     )
       throw new Error('Token has expired');
+
+    if (user.steamId) {
+      throw new Error('This user already has a linked Steam account');
+    }
+
     try {
       await this.prisma.user.update({
         where: { id: user.id },
@@ -139,5 +155,12 @@ export class SteamAuthService {
       select: { steamId: true },
     });
     return user?.steamId ?? null;
+  }
+
+  async unlinkSteamId(userId: string): Promise<void> {
+    await this.prisma.user.updateMany({
+      where: { id: userId },
+      data: { steamId: null },
+    });
   }
 }
