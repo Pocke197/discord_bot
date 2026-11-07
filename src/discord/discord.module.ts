@@ -3,6 +3,10 @@ import { DiscordUpdate } from './discord.update.js';
 import { NecordModule } from 'necord';
 import { IntentsBitField } from 'discord.js';
 import { LevelsModule } from './levels/levels.module.js';
+import { SteamModule } from '../steam/steam.module.js';
+import { BibliotecaCommands } from './commands/library.commands.js';
+import { SteamLinkCommands } from './commands/steam-link.commands.js';
+import { SteamAuthModule } from '../steam/auth/steam-auth.module.js';
 
 @Module({
   imports: [
@@ -14,7 +18,9 @@ import { LevelsModule } from './levels/levels.module.js';
       ],
     }),
     LevelsModule,
+    SteamModule,
+    SteamAuthModule,
   ],
-  providers: [DiscordUpdate],
+  providers: [DiscordUpdate, BibliotecaCommands, SteamLinkCommands],
 })
 export class DiscordModule {}

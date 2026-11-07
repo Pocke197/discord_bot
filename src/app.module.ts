@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { createObserveModule } from '@nestjs/observe';
 import { DiscordModule } from './discord/discord.module.js';
 import { HealthModule } from './health/health.module.js';
+import { SteamAuthModule } from './steam/auth/steam-auth.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -14,6 +15,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     }),
     DiscordModule,
     HealthModule,
+    SteamAuthModule,
   ],
 })
 export class AppModule {}

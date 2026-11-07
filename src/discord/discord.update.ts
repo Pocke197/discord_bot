@@ -2,15 +2,20 @@ import { Injectable, Logger } from '@nestjs/common';
 import { On, Once, Context } from 'necord';
 import type { ContextOf } from 'necord';
 import { LevelsService } from './levels/levels.service.js';
+import { SteamService } from '../steam/steam.service.js';
 
 @Injectable()
 export class DiscordUpdate {
   private readonly logger = new Logger(DiscordUpdate.name);
-
-  constructor(private readonly levelsService: LevelsService) {}
+  constructor(
+    private readonly levelsService: LevelsService,
+    private readonly steamService: SteamService,
+  ) {}
 
   @Once('clientReady')
-  public onReady(@Context() [client]: ContextOf<'clientReady'>): void {
+  public async onReady(
+    @Context() [client]: ContextOf<'clientReady'>,
+  ): Promise<void> {
     this.logger.log(`Bot logged in as ${client.user.username}`);
   }
 

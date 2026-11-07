@@ -1,0 +1,17 @@
+const STEAM_LINK_TTL_MS = 10 * 60 * 1000;
+const LIMIT_TOP_GAMES = 15;
+const LIMIT_CHARACTERS = 2000;
+
+const SAFE_MESSAGES = new Set([
+  'Invalid or expired token',
+  'Token has expired',
+  'Steam account is already linked to another user',
+  'This user already has a linked Steam account',
+]);
+
+export default {
+  STEAM_LINK_TTL_MS,
+  SAFE_MESSAGES,
+  LIMIT_TOP_GAMES,
+  LIMIT_CHARACTERS,
+};
