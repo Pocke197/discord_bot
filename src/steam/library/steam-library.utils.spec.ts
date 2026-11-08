@@ -144,7 +144,9 @@ describe('getCommonGames', () => {
       createGame(3, 'Solo del segundo usuario', 75),
     ];
 
-    expect(getCommonGames([firstLibrary, secondLibrary])).toEqual([commonGame]);
+    expect(getCommonGames([firstLibrary, secondLibrary])).toEqual([
+      createGame(1, 'Juego en común', 200),
+    ]);
   });
 
   it('devuelve una lista vacía cuando no hay juegos en común', () => {
@@ -173,7 +175,9 @@ describe('getCommonGames', () => {
       [createGame(2, 'Juego de los tres usuarios', 50)],
     ];
 
-    expect(getCommonGames(libraries)).toEqual([libraries[0][1]]);
+    expect(getCommonGames(libraries)).toEqual([
+      createGame(2, 'Juego de los tres usuarios', 110),
+    ]);
   });
 
   it('devuelve una lista vacía cuando hay una biblioteca vacía entre varias', () => {
@@ -186,13 +190,23 @@ describe('getCommonGames', () => {
     expect(getCommonGames(libraries)).toEqual([]);
   });
 
-  it('devuelve toda la biblioteca cuando hay un solo usuario', () => {
+  it('no modifica las bibliotecas originales', () => {
+    const firstLibrary = [createGame(1, 'Juego compartido', 10)];
+    const secondLibrary = [createGame(1, 'Juego compartido', 20)];
+
+    getCommonGames([firstLibrary, secondLibrary]);
+
+    expect(firstLibrary[0].playtime_forever).toBe(10);
+    expect(secondLibrary[0].playtime_forever).toBe(20);
+  });
+
+  it('devuelve toda la biblioteca ordenada por horas cuando hay un solo usuario', () => {
     const library = [
       createGame(1, 'Primer juego', 10),
       createGame(2, 'Segundo juego', 20),
     ];
 
-    expect(getCommonGames([library])).toEqual(library);
+    expect(getCommonGames([library])).toEqual([library[1], library[0]]);
   });
 
   it('devuelve varios juegos en común entre dos usuarios', () => {
@@ -208,8 +222,8 @@ describe('getCommonGames', () => {
     ];
 
     expect(getCommonGames([firstLibrary, secondLibrary])).toEqual([
-      firstLibrary[0],
-      firstLibrary[1],
+      createGame(2, 'Segundo juego compartido', 70),
+      createGame(1, 'Primer juego compartido', 50),
     ]);
   });
 });
