@@ -40,25 +40,28 @@ const formatLibrary = (games: SteamGame[]): string => {
 };
 
 const getCommonGames = (libraries: SteamGame[][]): SteamGame[] => {
-  const userLibraries = libraries.map(
-    (userGames) => new Set(userGames.map((game) => game.appid)),
-  );
-
-  if (userLibraries.length === 0) {
+  if (libraries.length === 0) {
     return [];
   }
 
-  const commonAppIds = userLibraries.reduce((common, userSet) => {
-    return new Set([...common].filter((appid) => userSet.has(appid)));
-  });
+  const table = new Map<number, { game: SteamGame; count: number }>();
 
-  const commonGames: SteamGame[] = [];
-  for (const appid of commonAppIds) {
-    const game = libraries[0].find((game) => game.appid === appid);
-    if (game) {
-      commonGames.push(game);
+  for (const library of libraries) {
+    for (const game of library) {
+      if (table.has(game.appid)) {
+        const entry = table.get(game.appid)!;
+        entry.count++;
+        entry.game.playtime_forever += game.playtime_forever;
+      } else {
+        table.set(game.appid, { game: { ...game }, count: 1 });
+      }
     }
   }
+
+  const commonGames = Array.from(table.values())
+    .filter((entry) => entry.count === libraries.length)
+    .map((entry) => entry.game)
+    .sort((a, b) => b.playtime_forever - a.playtime_forever);
 
   return commonGames;
 };
