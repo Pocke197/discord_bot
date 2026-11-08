@@ -1,4 +1,5 @@
 import {
+  formatCommonGames,
   formatLibrary,
   getCommonGames,
   getTopGamesByPlaytime,
@@ -265,5 +266,56 @@ describe('formatLibrary', () => {
     expect(message).toContain(`1. ${longGameName.slice(0, 50)}`);
     expect(message).not.toContain(longGameName);
     expect(message.length).toBeLessThanOrEqual(constants.LIMIT_CHARACTERS);
+  });
+});
+
+describe('formatCommonGames', () => {
+  it('muestra una lista corta completa y numerada', () => {
+    const games = [
+      createGame(1, 'Primer juego', 0),
+      createGame(2, 'Segundo juego', 0),
+      createGame(3, 'Tercer juego', 0),
+    ];
+    const message = formatCommonGames(games, 1000);
+    expect(message).toBe('1. Primer juego\n2. Segundo juego\n3. Tercer juego');
+  });
+
+  it('indica cuántos juegos quedan fuera del límite', () => {
+    const games = Array.from(
+      { length: constants.LIMIT_COMMON_GAMES + 3 },
+      (_, index) => createGame(index + 1, `Juego ${index + 1}`, 0),
+    );
+
+    const message = formatCommonGames(games, 1000);
+
+    expect(message).toContain('and 3 more');
+    expect(message).toContain(
+      `${constants.LIMIT_COMMON_GAMES}. Juego ${constants.LIMIT_COMMON_GAMES}`,
+    );
+  });
+
+  it('corta los nombres a 50 caracteres', () => {
+    const longGameName = 'A'.repeat(60);
+
+    const message = formatCommonGames([createGame(1, longGameName, 0)], 1000);
+
+    expect(message).toBe(`1. ${longGameName.slice(0, 50)}`);
+    expect(message).not.toContain(longGameName);
+  });
+
+  it('no supera el máximo de caracteres', () => {
+    const games = Array.from(
+      { length: constants.LIMIT_TOP_GAMES },
+      (_, index) => createGame(index + 1, `Juego ${index + 1}`, 0),
+    );
+
+    const message = formatCommonGames(games, 40);
+
+    expect(message.length).toBeLessThanOrEqual(40);
+    expect(message).toContain('1. Juego 1');
+  });
+
+  it('devuelve un texto vacío cuando el máximo es cero', () => {
+    expect(formatCommonGames([createGame(1, 'Juego', 0)], 0)).toBe('');
   });
 });

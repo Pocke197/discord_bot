@@ -1,4 +1,4 @@
-import { SteamGame } from '../steam.service.js';
+import type { SteamGame } from '../steam.service.js';
 import constants from '../../constants.js';
 
 const getTopGamesByPlaytime = (
@@ -63,10 +63,34 @@ const getCommonGames = (libraries: SteamGame[][]): SteamGame[] => {
   return commonGames;
 };
 
+const formatCommonGames = (
+  games: SteamGame[],
+  maxCharacters: number,
+): string => {
+  const gamesToShow = games.slice(0, constants.LIMIT_COMMON_GAMES);
+  const lines = gamesToShow.map(
+    (game, index) => `${index + 1}. ${game.name.slice(0, 50)}`,
+  );
+
+  const format = (count: number) => {
+    const omitted = games.length - count;
+    const list = lines.slice(0, count).join('\n');
+    return omitted > 0 ? `${list}\nand ${omitted} more` : list;
+  };
+
+  let count = 0;
+  while (count < lines.length && format(count + 1).length <= maxCharacters) {
+    count++;
+  }
+
+  return format(count).slice(0, maxCharacters);
+};
+
 export {
   getTopGamesByPlaytime,
   notPlayedGames,
   playtimeToHours,
   formatLibrary,
   getCommonGames,
+  formatCommonGames,
 };
