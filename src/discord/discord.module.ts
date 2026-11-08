@@ -7,6 +7,7 @@ import { SteamModule } from '../steam/steam.module.js';
 import { BibliotecaCommands } from './commands/library.commands.js';
 import { SteamLinkCommands } from './commands/steam-link.commands.js';
 import { SteamAuthModule } from '../steam/auth/steam-auth.module.js';
+import { GameNightCommands } from './commands/gamenight/gamenight.commands.js';
 
 @Module({
   imports: [
@@ -21,6 +22,11 @@ import { SteamAuthModule } from '../steam/auth/steam-auth.module.js';
     SteamModule,
     SteamAuthModule,
   ],
-  providers: [DiscordUpdate, BibliotecaCommands, SteamLinkCommands],
+  providers: [
+    DiscordUpdate,
+    BibliotecaCommands,
+    SteamLinkCommands,
+    GameNightCommands,
+  ],
 })
 export class DiscordModule {}

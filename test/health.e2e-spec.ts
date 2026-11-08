@@ -8,7 +8,7 @@ import { AppModule } from './../src/app.module.js';
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     vi.spyOn(Client.prototype, 'login').mockResolvedValue('fake-token');
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -23,7 +23,7 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer()).get('/health').expect(200);
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     await app.close();
     vi.restoreAllMocks();
   });
