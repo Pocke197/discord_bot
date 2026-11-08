@@ -319,7 +319,7 @@ describe('formatCommonGames', () => {
 
   it('no supera el máximo de caracteres', () => {
     const games = Array.from(
-      { length: constants.LIMIT_COMMON_GAMES },
+      { length: constants.LIMIT_TOP_GAMES },
       (_, index) => createGame(index + 1, `Juego ${index + 1}`, 0),
     );
 
