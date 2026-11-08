@@ -22,6 +22,11 @@ import { GameNightCommands } from './commands/gamenight/gamenight.commands.js';
     SteamModule,
     SteamAuthModule,
   ],
-  providers: [DiscordUpdate, BibliotecaCommands, SteamLinkCommands, GameNightCommands],
+  providers: [
+    DiscordUpdate,
+    BibliotecaCommands,
+    SteamLinkCommands,
+    GameNightCommands,
+  ],
 })
 export class DiscordModule {}

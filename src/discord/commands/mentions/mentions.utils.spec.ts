@@ -32,11 +32,10 @@ describe('parseMentionedUsersId', () => {
     expect(parseMentionedUsersIds('<@&123456789>')).toEqual([]);
   });
 
-  it('devuelve una lista vacía para @everyone o texto sin menciones', () => {
-    expect(parseMentionedUsersIds('@everyone texto')).toEqual([]);
-  });
-
-  it('devuelve una lista vacía para texto vacío', () => {
-    expect(parseMentionedUsersIds('')).toEqual([]);
-  });
+  it.each(['@everyone texto', ''])(
+    'devuelve una lista vacía para "%s"',
+    (text) => {
+      expect(parseMentionedUsersIds(text)).toEqual([]);
+    },
+  );
 });
