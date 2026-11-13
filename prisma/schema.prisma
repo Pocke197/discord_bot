@@ -16,12 +16,13 @@ model Guild {
 }
 
 model User {
-  id                   String    @id
-  createdAt            DateTime  @default(now())
-  steamId              String?   @unique
-  steamLinkToken       String?   @unique
+  id                   String             @id
+  createdAt            DateTime           @default(now())
+  steamId              String?            @unique
+  steamLinkToken       String?            @unique
   steamLinkRequestedAt DateTime?
   members              Member[]
+  snapshots            PlaytimeSnapshot[]
 }
 
 model Member {
@@ -34,4 +35,15 @@ model Member {
 
   @@id([guildId, userId])
   @@index([guildId, xp])
+}
+
+model PlaytimeSnapshot {
+  userId          String
+  appId           Int
+  date            DateTime @db.Date
+  playtimeForever Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, appId, date])
+  @@index([date])
 }
