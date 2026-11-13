@@ -3,16 +3,12 @@ import { SteamAuthService } from '../../steam/auth/steam-auth.service.js';
 import { Context, SlashCommand } from 'necord';
 import type { SlashCommandContext } from 'necord';
 import { MessageFlags } from 'discord.js';
-import { SteamService } from '../../steam/steam.service.js';
 
 @Injectable()
 export class SteamLinkCommands {
   private readonly logger = new Logger(SteamLinkCommands.name);
 
-  constructor(
-    private steamAuthService: SteamAuthService,
-    private steamService: SteamService,
-  ) {}
+  constructor(private steamAuthService: SteamAuthService) {}
 
   @SlashCommand({
     name: 'steam-login',
