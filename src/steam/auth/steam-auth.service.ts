@@ -16,9 +16,16 @@ export class SteamAuthService {
 
   private getPublicUrl(): string {
     const publicUrl = process.env.PUBLIC_URL?.replace(/\/+$/, '');
+
     if (!publicUrl) {
       throw new Error(
         'PUBLIC_URL must be configured to build the Steam login URL',
+      );
+    }
+
+    if (!/^https?:\/\/.+/.test(publicUrl)) {
+      throw new Error(
+        'PUBLIC_URL must be a valid URL starting with http:// or https://',
       );
     }
 
@@ -31,8 +38,6 @@ export class SteamAuthService {
   }
 
   buildLoginUrl(token: string): string {
-    this.logger.log('Building Steam login URL with token');
-
     const baseUrl = 'https://steamcommunity.com/openid/login';
 
     const params = new URLSearchParams({
@@ -82,11 +87,6 @@ export class SteamAuthService {
     if (!response.ok) {
       return false;
     }
-
-    this.logger.log(
-      'Steam OpenID verification response status:',
-      response.status,
-    );
 
     const text = await response.text();
     return text.includes('is_valid:true');

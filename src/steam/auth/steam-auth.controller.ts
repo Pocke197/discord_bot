@@ -43,7 +43,7 @@ export class SteamAuthController {
     );
 
     if (!isVerified) {
-      throw new BadRequestException('Steam OpenID verification failed');
+      this.logger.error('Steam OpenID verification failed');
     }
 
     const steamId = this.steamAuth.getSteamIdFromOpenId(
