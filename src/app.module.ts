@@ -1,21 +1,17 @@
 import { Module } from '@nestjs/common';
-import { createObserveModule } from '@nestjs/observe';
+import { ScheduleModule } from '@nestjs/schedule';
 import { DiscordModule } from './discord/discord.module.js';
 import { HealthModule } from './health/health.module.js';
 import { SteamAuthModule } from './steam/auth/steam-auth.module.js';
-
-export const { ObserveModule, ObserveInstrument } = createObserveModule();
+import { SteamSnapshotsModule } from './steam/snapshots/steam-snapshots.module.js';
 
 @Module({
   imports: [
-    ObserveModule.forRoot({
-      appKey: process.env.OBSERVE_APP_KEY ?? 'YOUR_APP_KEY',
-      appSecret: process.env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
-      serviceId: 'project-name',
-    }),
     DiscordModule,
     HealthModule,
     SteamAuthModule,
+    SteamSnapshotsModule,
+    ScheduleModule.forRoot(),
   ],
 })
 export class AppModule {}

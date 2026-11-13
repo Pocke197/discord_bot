@@ -15,6 +15,10 @@ const notPlayedGames = (games: SteamGame[]): SteamGame[] => {
   return games.filter((game) => game.playtime_forever === 0);
 };
 
+const playedGames = (games: SteamGame[]): SteamGame[] => {
+  return games.filter((game) => game.playtime_forever > 0);
+};
+
 const playtimeToHours = (minutes: number): number => {
   return Math.round(minutes / 6) / 10;
 };
@@ -92,6 +96,7 @@ const formatCommonGames = (
 export {
   getTopGamesByPlaytime,
   notPlayedGames,
+  playedGames,
   playtimeToHours,
   formatLibrary,
   getCommonGames,
