@@ -23,7 +23,6 @@
     "prisma:generate": "prisma generate"
   },
   "dependencies": {
-    "@jest/globals": "^30.5.2",
     "@nestjs/common": "^12.4.0",
     "@nestjs/core": "^12.4.0",
     "@nestjs/platform-express": "^12.4.0",
