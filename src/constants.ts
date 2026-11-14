@@ -2,6 +2,7 @@ const STEAM_LINK_TTL_MS = 10 * 60 * 1000;
 const LIMIT_TOP_GAMES = 15;
 const LIMIT_COMMON_GAMES = 15;
 const LIMIT_CHARACTERS = 2000;
+const POINTS_PER_LEVEL = 3;
 
 const SAFE_MESSAGES = new Set([
   'Invalid or expired token',
@@ -16,4 +17,5 @@ export default {
   LIMIT_TOP_GAMES,
   LIMIT_COMMON_GAMES,
   LIMIT_CHARACTERS,
+  POINTS_PER_LEVEL,
 };

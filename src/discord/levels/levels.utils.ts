@@ -1,3 +1,12 @@
+import constants from '../../constants.js';
+
+export type Stats = {
+  luck: number;
+  charisma: number;
+  endurance: number;
+  skill: number;
+};
+
 const xpForLevel = (level: number): number => {
   return Math.floor(5 * level ** 2 + 50 * level + 100);
 };
@@ -11,4 +20,23 @@ const levelForXp = (xp: number): number => {
   return level;
 };
 
-export { xpForLevel, levelForXp };
+const getSpentPoints = (stats: Stats): number => {
+  return stats.luck + stats.charisma + stats.endurance + stats.skill;
+};
+
+const getAvailablePoints = (level: number, stats: Stats): number => {
+  const spentPoints = getSpentPoints(stats);
+  const availablePoints = Math.max(
+    0,
+    level * constants.POINTS_PER_LEVEL - spentPoints,
+  );
+  return availablePoints;
+};
+
+const getAura = (stats: Stats): number => {
+  const { luck, charisma, endurance, skill } = stats;
+  const aura = Math.round(charisma * 2 + luck * 1.5 + endurance * 1.2 + skill);
+  return aura;
+};
+
+export { xpForLevel, levelForXp, getSpentPoints, getAvailablePoints, getAura };
