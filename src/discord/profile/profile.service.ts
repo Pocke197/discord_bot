@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
 import { LevelsService } from '../levels/levels.service.js';
-import { getAvailablePoints, getAura } from '../levels/levels.utils.js';
+import { getAvailablePoints, getAura } from '../stats/stats.utils.js';
 
 export type Profile = {
   xp: number;
