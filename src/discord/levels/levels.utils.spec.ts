@@ -1,12 +1,11 @@
 import constants from '../../constants.js';
+import { levelForXp, xpForLevel } from './levels.utils.js';
 import {
   getAura,
   getAvailablePoints,
   getSpentPoints,
-  levelForXp,
-  type Stats,
-  xpForLevel,
-} from './levels.utils.js';
+} from '../stats/stats.utils.js';
+import type { Stats } from '../stats/stats.utils.js';
 
 describe('LevelUtils', () => {
   describe('xpForLevel', () => {

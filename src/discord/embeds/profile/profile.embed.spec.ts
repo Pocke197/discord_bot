@@ -26,12 +26,12 @@ describe('buildProfileEmbed', () => {
     expect(embed).toBeInstanceOf(EmbedBuilder);
     expect(embed.data.title).toBe('Level 5');
     expect(embed.data.thumbnail?.url).toBe('https://example.com/avatar.png');
-    expect(embed.data.fields?.some((field) => field.value.includes('300'))).toBe(
+    expect(
+      embed.data.fields?.some((field) => field.value.includes('300')),
+    ).toBe(true);
+    expect(embed.data.fields?.some((field) => field.value.includes('13'))).toBe(
       true,
     );
-    expect(
-      embed.data.fields?.some((field) => field.value.includes('13')),
-    ).toBe(true);
     expect(embed.data.footer?.text).toContain('7');
     expect(embed.data.image).toBeUndefined();
   });

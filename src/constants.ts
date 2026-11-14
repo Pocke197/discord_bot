@@ -11,9 +11,15 @@ const SAFE_MESSAGES = new Set([
   'This user already has a linked Steam account',
 ]);
 
+const STATS_ERROR = new Set([
+  'Not enough available points to assign',
+  'Invalid amount',
+]);
+
 export default {
   STEAM_LINK_TTL_MS,
   SAFE_MESSAGES,
+  STATS_ERROR,
   LIMIT_TOP_GAMES,
   LIMIT_COMMON_GAMES,
   LIMIT_CHARACTERS,
