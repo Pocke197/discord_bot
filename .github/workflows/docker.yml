@@ -47,3 +47,21 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Avisar a Discord (exitoso)
+        if: success() && github.event_name == 'push'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d "{\"content\": \"Se ha construido y subido la imagen de Docker para el commit ${{ github.sha }} en la rama ${{ github.ref_name }}. Puedes ver los detalles en [GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\"}" \
+          $DISCORD_WEBHOOK_URL
+      
+      - name: Avisar a Discord (fallido)
+        if: failure() && github.event_name == 'push'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d "{\"content\": \"La construcción de la imagen de Docker ha fallado para el commit ${{ github.sha }} en la rama ${{ github.ref_name }}. Puedes ver los detalles en [GitHub Actions](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\"}" \
+          $DISCORD_WEBHOOK_URL

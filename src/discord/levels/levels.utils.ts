@@ -1,3 +1,5 @@
+import constants from '../../constants.js';
+
 const xpForLevel = (level: number): number => {
   return Math.floor(5 * level ** 2 + 50 * level + 100);
 };
