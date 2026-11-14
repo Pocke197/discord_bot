@@ -2,15 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { On, Once, Context } from 'necord';
 import type { ContextOf } from 'necord';
 import { LevelsService } from './levels/levels.service.js';
-import { SteamService } from '../steam/steam.service.js';
+import { getRandomXp } from './levels/levels.utils.js';
 
 @Injectable()
 export class DiscordUpdate {
   private readonly logger = new Logger(DiscordUpdate.name);
-  constructor(
-    private readonly levelsService: LevelsService,
-    private readonly steamService: SteamService,
-  ) {}
+  constructor(private readonly levelsService: LevelsService) {}
 
   @Once('clientReady')
   public async onReady(
@@ -35,7 +32,7 @@ export class DiscordUpdate {
         const leveledUp = await this.levelsService.addXp(
           message.author.id,
           message.guildId,
-          10,
+          getRandomXp(),
         );
 
         if (leveledUp) {

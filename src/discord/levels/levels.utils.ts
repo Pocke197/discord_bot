@@ -4,13 +4,25 @@ const xpForLevel = (level: number): number => {
   return Math.floor(5 * level ** 2 + 50 * level + 100);
 };
 
-const levelForXp = (xp: number): number => {
+const getLevelProgress = (xp: number) => {
   let level = 0;
-  while (xp >= xpForLevel(level)) {
-    xp -= xpForLevel(level);
+  let currentXp = xp;
+
+  while (currentXp >= xpForLevel(level)) {
+    currentXp -= xpForLevel(level);
     level++;
   }
-  return level;
+
+  return { level, currentXp, neededXp: xpForLevel(level) };
 };
 
-export { xpForLevel, levelForXp };
+const levelForXp = (xp: number): number => getLevelProgress(xp).level;
+
+const getRandomXp = (): number => {
+  return (
+    Math.floor(Math.random() * (constants.MAX_XP - constants.MIN_XP + 1)) +
+    constants.MIN_XP
+  );
+};
+
+export { xpForLevel, levelForXp, getRandomXp, getLevelProgress };
