@@ -1,11 +1,14 @@
-import { EmbedBuilder, User } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
+import type { User } from 'discord.js';
 import type { Profile } from '../../profile/profile.service.js';
 
+const PROGRESS_BAR_LENGTH = 12;
+
 export function buildProfileEmbed(user: User, profile: Profile) {
-  const xpForNextLevel = Math.max((profile.level + 1) * 100, profile.xp);
-  const progress = Math.min(profile.xp / xpForNextLevel, 1);
-  const progressBar = `${'█'.repeat(Math.round(progress * 12))}${'░'.repeat(
-    12 - Math.round(progress * 12),
+  const progress = profile.currentXp / profile.neededXp;
+  const filled = Math.floor(progress * PROGRESS_BAR_LENGTH);
+  const progressBar = `${'█'.repeat(filled)}${'░'.repeat(
+    PROGRESS_BAR_LENGTH - filled,
   )}`;
 
   const embed = new EmbedBuilder()
@@ -24,7 +27,7 @@ export function buildProfileEmbed(user: User, profile: Profile) {
     .addFields(
       {
         name: 'XP',
-        value: `${progressBar}\n${profile.xp} / ${xpForNextLevel} XP`,
+        value: `${progressBar}\n${profile.currentXp} / ${profile.neededXp} XP`,
         inline: false,
       },
       { name: 'Aura', value: profile.aura.toString(), inline: true },

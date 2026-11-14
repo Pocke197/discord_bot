@@ -7,8 +7,8 @@ import { MessageFlags } from 'discord.js';
 import constants from '../../../constants.js';
 
 @Injectable()
-export class StatsCommand {
-  private readonly logger = new Logger(StatsCommand.name);
+export class StatsCommands {
+  private readonly logger = new Logger(StatsCommands.name);
   constructor(private readonly statsService: StatsService) {}
   @SlashCommand({
     name: 'stats',
@@ -37,10 +37,7 @@ export class StatsCommand {
         content: `Successfully assigned ${options.amount} points to ${options.stat}. You have ${remainingPoints} points remaining.`,
       });
     } catch (error) {
-      if (
-        error instanceof Error &&
-        constants.STATS_ERROR.has(error.message)
-      ) {
+      if (error instanceof Error && constants.STATS_ERROR.has(error.message)) {
         return await interaction.reply({
           content: error.message,
           flags: MessageFlags.Ephemeral,

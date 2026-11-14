@@ -11,6 +11,7 @@ import { GameNightCommands } from './commands/gamenight/gamenight.commands.js';
 import { ProfileCommands } from './commands/profile/profile.commands.js';
 import { ProfileModule } from './profile/profile.module.js';
 import { StatsModule } from './stats/stats.module.js';
+import { StatsCommands } from './commands/stats/stats.command.js';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { StatsModule } from './stats/stats.module.js';
     SteamLinkCommands,
     GameNightCommands,
     ProfileCommands,
+    StatsCommands,
   ],
 })
 export class DiscordModule {}
