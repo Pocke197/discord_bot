@@ -8,6 +8,9 @@ import { BibliotecaCommands } from './commands/library.commands.js';
 import { SteamLinkCommands } from './commands/steam-link.commands.js';
 import { SteamAuthModule } from '../steam/auth/steam-auth.module.js';
 import { GameNightCommands } from './commands/gamenight/gamenight.commands.js';
+import { ProfileCommands } from './commands/profile/profile.commands.js';
+import { ProfileModule } from './profile/profile.module.js';
+import { StatsModule } from './stats/stats.module.js';
 
 @Module({
   imports: [
@@ -21,12 +24,15 @@ import { GameNightCommands } from './commands/gamenight/gamenight.commands.js';
     LevelsModule,
     SteamModule,
     SteamAuthModule,
+    ProfileModule,
+    StatsModule,
   ],
   providers: [
     DiscordUpdate,
     BibliotecaCommands,
     SteamLinkCommands,
     GameNightCommands,
+    ProfileCommands,
   ],
 })
 export class DiscordModule {}
