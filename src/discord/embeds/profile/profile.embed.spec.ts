@@ -1,14 +1,18 @@
 import { EmbedBuilder, type User } from 'discord.js';
 import { buildProfileEmbed } from './profile.embed.js';
 
-const profile = {
-  level: 5,
+type Profile = Parameters<typeof buildProfileEmbed>[1];
+
+const profile: Profile = {
+  level: 1,
   xp: 300,
+  currentXp: 154,
+  neededXp: 155,
   aura: 13,
-  luck: 0,
-  charisma: 0,
-  endurance: 0,
-  skill: 0,
+  luck: 2,
+  charisma: 4,
+  endurance: 6,
+  skill: 8,
   availablePoints: 7,
 };
 
@@ -24,14 +28,14 @@ describe('buildProfileEmbed', () => {
     const embed = buildProfileEmbed(createUser(), profile);
 
     expect(embed).toBeInstanceOf(EmbedBuilder);
-    expect(embed.data.title).toBe('Level 5');
+    expect(embed.data.author?.name).toBe('test-user');
+    expect(embed.data.title).toBe('Level 1');
     expect(embed.data.thumbnail?.url).toBe('https://example.com/avatar.png');
-    expect(
-      embed.data.fields?.some((field) => field.value.includes('300')),
-    ).toBe(true);
-    expect(embed.data.fields?.some((field) => field.value.includes('13'))).toBe(
-      true,
-    );
+    const xpField = embed.data.fields?.find((field) => field.name === 'XP');
+    const auraField = embed.data.fields?.find((field) => field.name === 'Aura');
+
+    expect(xpField?.value).toContain('154 / 155');
+    expect(auraField?.value).toBe('13');
     expect(embed.data.footer?.text).toContain('7');
     expect(embed.data.image).toBeUndefined();
   });
@@ -43,5 +47,24 @@ describe('buildProfileEmbed', () => {
     );
 
     expect(embed.data.image?.url).toBe('https://example.com/banner.png');
+  });
+
+  it('shows an empty XP bar when current XP is zero', () => {
+    const embed = buildProfileEmbed(createUser(), {
+      ...profile,
+      currentXp: 0,
+    });
+    const xpField = embed.data.fields?.find((field) => field.name === 'XP');
+
+    expect(xpField?.value).toContain('0 / 155');
+    expect(xpField?.value).not.toContain('█');
+  });
+
+  it('does not show a full XP bar at 154 / 155', () => {
+    const embed = buildProfileEmbed(createUser(), profile);
+    const xpField = embed.data.fields?.find((field) => field.name === 'XP');
+
+    expect(xpField?.value).toContain('154 / 155');
+    expect(xpField?.value).toContain('░');
   });
 });

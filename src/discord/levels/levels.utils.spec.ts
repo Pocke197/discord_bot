@@ -1,5 +1,10 @@
 import constants from '../../constants.js';
-import { levelForXp, xpForLevel } from './levels.utils.js';
+import {
+  getLevelProgress,
+  getRandomXp,
+  levelForXp,
+  xpForLevel,
+} from './levels.utils.js';
 import {
   getAura,
   getAvailablePoints,
@@ -10,6 +15,7 @@ import type { Stats } from '../stats/stats.utils.js';
 describe('LevelUtils', () => {
   describe('xpForLevel', () => {
     it.each([
+      [0, 100],
       [1, 155],
       [2, 220],
       [3, 295],
@@ -20,11 +26,34 @@ describe('LevelUtils', () => {
 
   describe('levelForXp', () => {
     it.each([
+      [0, 0],
+      [99, 0],
       [155, 1],
       [365, 2],
       [640, 3],
     ])('calculates level for %d XP', (xp, expectedLevel) => {
       expect(levelForXp(xp)).toBe(expectedLevel);
+    });
+  });
+
+  describe('getLevelProgress', () => {
+    it.each([
+      [0, { level: 0, currentXp: 0, neededXp: 100 }],
+      [100, { level: 1, currentXp: 0, neededXp: 155 }],
+      [155, { level: 1, currentXp: 55, neededXp: 155 }],
+      [365, { level: 2, currentXp: 110, neededXp: 220 }],
+    ])('calculates progress for %d XP', (xp, expectedProgress) => {
+      expect(getLevelProgress(xp)).toEqual(expectedProgress);
+    });
+  });
+
+  describe('getRandomXp', () => {
+    it('returns XP within the configured range', () => {
+      const xp = getRandomXp();
+
+      expect(xp).toBeGreaterThanOrEqual(constants.MIN_XP);
+      expect(xp).toBeLessThanOrEqual(constants.MAX_XP);
+      expect(Number.isInteger(xp)).toBe(true);
     });
   });
 

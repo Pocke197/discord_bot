@@ -3,6 +3,8 @@ const LIMIT_TOP_GAMES = 15;
 const LIMIT_COMMON_GAMES = 15;
 const LIMIT_CHARACTERS = 2000;
 const POINTS_PER_LEVEL = 3;
+const MIN_XP = 5;
+const MAX_XP = 15;
 
 const SAFE_MESSAGES = new Set([
   'Invalid or expired token',
@@ -24,4 +26,6 @@ export default {
   LIMIT_COMMON_GAMES,
   LIMIT_CHARACTERS,
   POINTS_PER_LEVEL,
+  MIN_XP,
+  MAX_XP,
 };
