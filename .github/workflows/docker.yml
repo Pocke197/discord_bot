@@ -3,6 +3,7 @@ name: Docker
 on:
   push:
     branches: [prod]
+    tags: ['v*']
   pull_request:
     branches: [prod, develop]
 
@@ -36,6 +37,7 @@ jobs:
           tags: |
             type=raw,value=latest
             type=sha
+            type=semver,pattern={{version}}
 
       - name: Build y push
         uses: docker/build-push-action@v7
@@ -49,7 +51,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Avisar a Discord (exitoso)
-        if: success() && github.event_name == 'push'
+        if: success() && github.event_name == 'push' && github.ref_type == 'branch'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
@@ -59,7 +61,7 @@ jobs:
         continue-on-error: true
       
       - name: Avisar a Discord (fallido)
-        if: failure() && github.event_name == 'push'
+        if: failure() && github.event_name == 'push' && github.ref_type == 'branch'
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
