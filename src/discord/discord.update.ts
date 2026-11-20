@@ -3,11 +3,19 @@ import { On, Once, Context } from 'necord';
 import type { ContextOf } from 'necord';
 import { LevelsService } from './levels/levels.service.js';
 import { getRandomXp } from './levels/levels.utils.js';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+  LEVEL_UP_EVENT,
+  type LevelUpEvent,
+} from './achievements/achievements.events.js';
 
 @Injectable()
 export class DiscordUpdate {
   private readonly logger = new Logger(DiscordUpdate.name);
-  constructor(private readonly levelsService: LevelsService) {}
+  constructor(
+    private readonly levelsService: LevelsService,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   @Once('clientReady')
   public async onReady(
@@ -43,10 +51,20 @@ export class DiscordUpdate {
           await message.reply(
             `Congratulations ${message.author.username}, you have leveled up to level ${newLevel}!`,
           );
+          const event: LevelUpEvent = {
+            userId: message.author.id,
+            guildId: message.guildId,
+            channelId: message.channelId,
+            level: newLevel,
+          };
+          this.eventEmitter.emit(LEVEL_UP_EVENT, event);
         }
       }
     } catch (error) {
-      this.logger.error('Error occurred while processing message:', error);
+      const errorName = error instanceof Error ? error.name : 'UnknownError';
+      this.logger.error(
+        `Error occurred while processing message: ${errorName}`,
+      );
     }
   }
 }
