@@ -1,8 +1,16 @@
 import { PrismaService } from '../../database/prisma.service.js';
 import { SteamService } from '../steam.service.js';
-import { playedGames } from '../library/steam-library.utils.js';
+import {
+  playedGames,
+  playtimeToHours,
+} from '../library/steam-library.utils.js';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+  SNAPSHOT_COMPLETED_EVENT,
+  type SnapshotCompletedEvent,
+} from '../../discord/achievements/achievements.events.js';
 
 @Injectable()
 export class SteamSnapshotsService {
@@ -10,6 +18,7 @@ export class SteamSnapshotsService {
   constructor(
     private prisma: PrismaService,
     private steamService: SteamService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   @Cron('0 4 * * *', { timeZone: 'America/Argentina/Buenos_Aires' })
@@ -64,11 +73,22 @@ export class SteamSnapshotsService {
             },
           });
         }
+
+        const maxHoursSingleGame = Math.max(
+          ...gamesPlayed.map((game) => playtimeToHours(game.playtime_forever)),
+          0,
+        );
+
+        const event: SnapshotCompletedEvent = {
+          userId: user.id,
+          maxHoursSingleGame,
+        };
+
+        this.eventEmitter.emit(SNAPSHOT_COMPLETED_EVENT, event);
       } catch (error) {
         const errorName = error instanceof Error ? error.name : 'UnknownError';
         this.logger.error(
-          `Error fetching the library for user ${user.id}:`,
-          errorName,
+          `Failed to take snapshot for user ${user.id}: ${errorName}`,
         );
       }
     }

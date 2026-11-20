@@ -2,7 +2,7 @@ name: Docker
 
 on:
   push:
-    branches: [prod]
+    branches: [prod, develop]
     tags: ['v*']
   pull_request:
     branches: [prod, develop]
@@ -35,9 +35,10 @@ jobs:
         with:
           images: ghcr.io/pocke197/discord_bot
           tags: |
-            type=raw,value=latest
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/prod' }} 
             type=sha
             type=semver,pattern={{version}}
+            type=ref,event=branch
 
       - name: Build y push
         uses: docker/build-push-action@v7

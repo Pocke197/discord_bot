@@ -23,19 +23,21 @@ model User {
   steamLinkRequestedAt DateTime?
   members              Member[]
   snapshots            PlaytimeSnapshot[]
+  achievements         UserAchievement[]
 }
 
 model Member {
-  guildId   String
-  userId    String
-  xp        Int       @default(0)
-  lastXpAt  DateTime?
-  charisma  Int       @default(0)
-  luck      Int       @default(0)
-  skill     Int       @default(0)
-  endurance Int       @default(0)
-  guild     Guild     @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guildId      String
+  userId       String
+  xp           Int                 @default(0)
+  lastXpAt     DateTime?
+  charisma     Int                 @default(0)
+  luck         Int                 @default(0)
+  skill        Int                 @default(0)
+  endurance    Int                 @default(0)
+  guild        Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievements MemberAchievement[]
 
   @@id([guildId, userId])
   @@index([guildId, xp])
@@ -50,4 +52,24 @@ model PlaytimeSnapshot {
 
   @@id([userId, appId, date])
   @@index([date])
+}
+
+model MemberAchievement {
+  guildId       String
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  member        Member   @relation(fields: [guildId, userId], references: [guildId, userId], onDelete: Cascade)
+
+  @@id([guildId, userId, achievementId])
+}
+
+model UserAchievement {
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, achievementId])
+  @@index([achievementId])
 }

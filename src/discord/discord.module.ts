@@ -13,6 +13,7 @@ import { ProfileCommands } from './commands/profile/profile.commands.js';
 import { ProfileModule } from './profile/profile.module.js';
 import { StatsModule } from './stats/stats.module.js';
 import { StatsCommands } from './commands/stats/stats.command.js';
+import { AchievementsModule } from './achievements/achievements.module.js';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { StatsCommands } from './commands/stats/stats.command.js';
     SteamAuthModule,
     ProfileModule,
     StatsModule,
+    AchievementsModule,
   ],
   providers: [
     DiscordUpdate,

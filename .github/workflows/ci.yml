@@ -36,7 +36,7 @@ jobs:
         run: pnpm lint
 
       - name: Tests
-        run: pnpm test
+        run: pnpm test:cov
 
       - name: Tests e2e
         run: pnpm test:e2e
