@@ -11,6 +11,9 @@ describe('AchievementsService', () => {
       findMany: ReturnType<typeof vi.fn>;
       createMany: ReturnType<typeof vi.fn>;
     };
+    userAchievement: {
+      findMany: ReturnType<typeof vi.fn>;
+    };
   };
 
   const achievementsUpTo = (level: number) =>
@@ -23,6 +26,9 @@ describe('AchievementsService', () => {
       memberAchievement: {
         findMany: vi.fn().mockResolvedValue([]),
         createMany: vi.fn().mockResolvedValue({ count: 0 }),
+      },
+      userAchievement: {
+        findMany: vi.fn().mockResolvedValue([]),
       },
     };
     service = new AchievementsService(prisma as unknown as PrismaService);
@@ -69,5 +75,35 @@ describe('AchievementsService', () => {
     expect(prisma.memberAchievement.createMany).toHaveBeenCalledWith(
       expect.objectContaining({ skipDuplicates: true }),
     );
+  });
+
+  it('junta los logros desbloqueados de miembro y usuario en el orden de ACHIEVEMENTS', async () => {
+    prisma.memberAchievement.findMany.mockResolvedValue([
+      { achievementId: 'level-5' },
+    ]);
+    prisma.userAchievement.findMany.mockResolvedValue([
+      { achievementId: 'game-100-hours' },
+    ]);
+
+    const result = await service.getUnlockedAchievements(userId, guildId);
+
+    expect(result.map(({ id }) => id)).toEqual(['level-5', 'game-100-hours']);
+  });
+
+  it('ignora los IDs de logros que no existen', async () => {
+    prisma.memberAchievement.findMany.mockResolvedValue([
+      { achievementId: 'level-5' },
+      { achievementId: 'logro-viejo' },
+    ]);
+
+    const result = await service.getUnlockedAchievements(userId, guildId);
+
+    expect(result.map(({ id }) => id)).toEqual(['level-5']);
+  });
+
+  it('devuelve un arreglo vacío cuando no hay logros desbloqueados', async () => {
+    const result = await service.getUnlockedAchievements(userId, guildId);
+
+    expect(result).toEqual([]);
   });
 });

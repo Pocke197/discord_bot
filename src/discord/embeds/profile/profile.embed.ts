@@ -1,6 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
 import type { User } from 'discord.js';
 import type { Profile } from '../../profile/profile.service.js';
+import { ACHIEVEMENTS } from '../../achievements/achievements.definitions.js';
 
 const PROGRESS_BAR_LENGTH = 12;
 
@@ -35,6 +36,11 @@ export function buildProfileEmbed(user: User, profile: Profile) {
       { name: 'Charisma', value: profile.charisma.toString(), inline: true },
       { name: 'Endurance', value: profile.endurance.toString(), inline: true },
       { name: 'Skill', value: profile.skill.toString(), inline: true },
+      {
+        name: `Achievements (${profile.achievements.length}/${ACHIEVEMENTS.length})`,
+        value: profile.achievements.map((achievement) => achievement.emoji).join(' ') || 'None yet',
+        inline: false,
+      },
     )
     .setFooter({
       text: `Available Points: ${profile.availablePoints.toString()}`,

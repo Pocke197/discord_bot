@@ -1,5 +1,9 @@
 import { EmbedBuilder, type User } from 'discord.js';
 import { buildProfileEmbed } from './profile.embed.js';
+import {
+  ACHIEVEMENTS,
+  type AchievementDefinition,
+} from '../../achievements/achievements.definitions.js'
 
 type Profile = Parameters<typeof buildProfileEmbed>[1];
 
@@ -14,7 +18,29 @@ const profile: Profile = {
   endurance: 6,
   skill: 8,
   availablePoints: 7,
+  achievements: [],
 };
+
+const achievements: AchievementDefinition[] = [
+  {
+    id: 'a',
+    name: 'A',
+    description: 'A',
+    emoji: '🏆',
+    scope: 'local',
+    metric: 'level',
+    threshold: 5,
+  },
+  {
+    id: 'b',
+    name: 'B',
+    description: 'B',
+    emoji: '🎉',
+    scope: 'local',
+    metric: 'level',
+    threshold: 10,
+  },
+];
 
 const createUser = (banner?: string) =>
   ({
@@ -66,5 +92,28 @@ describe('buildProfileEmbed', () => {
 
     expect(xpField?.value).toContain('154 / 155');
     expect(xpField?.value).toContain('░');
+  });
+
+  it('shows two achievements and their count', () => {
+    const embed = buildProfileEmbed(createUser(), {
+      ...profile,
+      achievements,
+    });
+    const achievementsField = embed.data.fields?.find((field) =>
+      field.name.startsWith('Achievements'),
+    );
+
+    expect(achievementsField?.name).toContain(`(2/${ACHIEVEMENTS.length})`);
+    expect(achievementsField?.value).toContain('🏆');
+    expect(achievementsField?.value).toContain('🎉');
+  });
+
+  it('shows None yet when there are no achievements', () => {
+    const embed = buildProfileEmbed(createUser(), profile);
+    const achievementsField = embed.data.fields?.find((field) =>
+      field.name.startsWith('Achievements'),
+    );
+
+    expect(achievementsField?.value).toBe('None yet');
   });
 });
