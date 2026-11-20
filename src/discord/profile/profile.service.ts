@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service.js';
 import { getLevelProgress } from '../levels/levels.utils.js';
 import { getAvailablePoints, getAura } from '../stats/stats.utils.js';
+import { AchievementsService } from '../achievements/achievements.service.js';
 
 export type Profile = {
   xp: number;
@@ -14,16 +15,20 @@ export type Profile = {
   skill: number;
   availablePoints: number;
   aura: number;
+  achievements: Awaited<ReturnType<AchievementsService['getUnlockedAchievements']>>;
 };
 
 @Injectable()
 export class ProfileService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private achievementsService: AchievementsService) {}
 
   async getProfile(userId: string, guildId: string): Promise<Profile> {
-    const profile = await this.prisma.member.findUnique({
-      where: { guildId_userId: { guildId: guildId, userId: userId } },
-    });
+    const [profile, achievements] = await Promise.all([
+      this.prisma.member.findUnique({ 
+        where: { guildId_userId: { guildId: guildId, userId: userId } }
+       }),
+      this.achievementsService.getUnlockedAchievements(userId, guildId),
+    ]);
 
     const emptyProfile = {
       xp: 0,
@@ -54,6 +59,7 @@ export class ProfileService {
       ...memberStats,
       availablePoints,
       aura,
+      achievements,
     };
   }
 }

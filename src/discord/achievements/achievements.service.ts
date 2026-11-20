@@ -49,4 +49,35 @@ export class AchievementsService {
 
     return newAchievements;
   }
+
+  async getUnlockedAchievements(
+    userId: string,
+    guildId: string,
+  ): Promise<AchievementDefinition[]> {
+    const [memberRows, userRows] = await Promise.all([
+      this.prisma.memberAchievement.findMany({
+        where: {
+          guildId: guildId,
+          userId: userId,
+        },
+        select: {
+          achievementId: true,
+        },
+      }),
+      this.prisma.userAchievement.findMany({
+        where: {
+          userId: userId,
+        },
+        select: {
+          achievementId: true,
+        },
+      }),
+    ]);
+    const unlockedIds = new Set(
+      [...memberRows, ...userRows].map((row) => row.achievementId),
+    );
+    return ACHIEVEMENTS.filter((achievement) =>
+      unlockedIds.has(achievement.id),
+    );
+  }
 }
