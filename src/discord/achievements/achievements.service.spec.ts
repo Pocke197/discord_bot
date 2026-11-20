@@ -13,12 +13,19 @@ describe('AchievementsService', () => {
     };
     userAchievement: {
       findMany: ReturnType<typeof vi.fn>;
+      createMany: ReturnType<typeof vi.fn>;
     };
   };
 
   const achievementsUpTo = (level: number) =>
     ACHIEVEMENTS.filter(
       ({ metric, threshold }) => metric === 'level' && threshold <= level,
+    );
+
+  const hourAchievementsUpTo = (hours: number) =>
+    ACHIEVEMENTS.filter(
+      ({ metric, threshold }) =>
+        metric === 'hours-single-game' && threshold <= hours,
     );
 
   beforeEach(() => {
@@ -29,6 +36,7 @@ describe('AchievementsService', () => {
       },
       userAchievement: {
         findMany: vi.fn().mockResolvedValue([]),
+        createMany: vi.fn().mockResolvedValue({ count: 0 }),
       },
     };
     service = new AchievementsService(prisma as unknown as PrismaService);
@@ -104,6 +112,44 @@ describe('AchievementsService', () => {
   it('devuelve un arreglo vacío cuando no hay logros desbloqueados', async () => {
     const result = await service.getUnlockedAchievements(userId, guildId);
 
+    expect(result).toEqual([]);
+  });
+
+  it('crea y devuelve solo el logro de 100 horas cuando no hay logros previos', async () => {
+    const expected = hourAchievementsUpTo(150);
+
+    const result = await service.checkHoursAchievements(userId, 150);
+
+    expect(result.map(({ id }) => id)).toEqual(['game-100-hours']);
+    expect(prisma.userAchievement.createMany).toHaveBeenCalledWith({
+      data: expected.map(({ id }) => ({ userId, achievementId: id })),
+      skipDuplicates: true,
+    });
+    expect(result).toEqual(expected);
+  });
+
+  it('solo crea el logro de 500 horas si el de 100 ya fue guardado', async () => {
+    prisma.userAchievement.findMany.mockResolvedValue([
+      { achievementId: 'game-100-hours' },
+    ]);
+    const expected = hourAchievementsUpTo(600).filter(
+      ({ id }) => id === 'game-500-hours',
+    );
+
+    const result = await service.checkHoursAchievements(userId, 600);
+
+    expect(result.map(({ id }) => id)).toEqual(['game-500-hours']);
+    expect(prisma.userAchievement.createMany).toHaveBeenCalledWith({
+      data: expected.map(({ id }) => ({ userId, achievementId: id })),
+      skipDuplicates: true,
+    });
+    expect(result).toEqual(expected);
+  });
+
+  it('no crea logros para 50 horas y devuelve un arreglo vacío', async () => {
+    const result = await service.checkHoursAchievements(userId, 50);
+
+    expect(prisma.userAchievement.createMany).not.toHaveBeenCalled();
     expect(result).toEqual([]);
   });
 });

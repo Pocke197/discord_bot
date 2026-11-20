@@ -3,7 +3,7 @@ import { buildProfileEmbed } from './profile.embed.js';
 import {
   ACHIEVEMENTS,
   type AchievementDefinition,
-} from '../../achievements/achievements.definitions.js'
+} from '../../achievements/achievements.definitions.js';
 
 type Profile = Parameters<typeof buildProfileEmbed>[1];
 

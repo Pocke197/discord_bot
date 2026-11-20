@@ -1,4 +1,5 @@
 const LEVEL_UP_EVENT = 'userLeveledUp';
+const SNAPSHOT_COMPLETED_EVENT = 'snapshotCompleted';
 
 export type LevelUpEvent = {
   userId: string;
@@ -7,4 +8,9 @@ export type LevelUpEvent = {
   level: number;
 };
 
-export { LEVEL_UP_EVENT };
+export type SnapshotCompletedEvent = {
+  userId: string;
+  maxHoursSingleGame: number;
+};
+
+export { LEVEL_UP_EVENT, SNAPSHOT_COMPLETED_EVENT };
