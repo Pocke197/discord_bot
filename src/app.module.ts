@@ -6,6 +6,7 @@ import { HealthModule } from './health/health.module.js';
 import { SteamAuthModule } from './steam/auth/steam-auth.module.js';
 import { SteamSnapshotsModule } from './steam/snapshots/steam-snapshots.module.js';
 import { validateEnv } from './config/env.validation.js';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { validateEnv } from './config/env.validation.js';
       validate: validateEnv,
       isGlobal: true,
     }),
+    EventEmitterModule.forRoot(),
     DiscordModule,
     HealthModule,
     SteamAuthModule,
