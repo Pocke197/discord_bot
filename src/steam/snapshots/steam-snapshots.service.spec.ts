@@ -1,4 +1,6 @@
 import { SteamSnapshotsService } from './steam-snapshots.service.js';
+import { SNAPSHOT_COMPLETED_EVENT } from '../../discord/achievements/achievements.events.js';
+import type { EventEmitter2 } from '@nestjs/event-emitter';
 import type { PrismaService } from '../../database/prisma.service.js';
 import type { SteamGame, SteamService } from '../steam.service.js';
 
@@ -17,11 +19,13 @@ describe('SteamSnapshotsService', () => {
   } as unknown as PrismaService;
 
   const steam = { getOwnedGames } as unknown as SteamService;
+  const emit = vi.fn();
+  const eventBus = { emit } as unknown as EventEmitter2;
   let service: SteamSnapshotsService;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    service = new SteamSnapshotsService(prisma, steam);
+    service = new SteamSnapshotsService(prisma, steam, eventBus);
     findMany.mockResolvedValue([
       { id: 'user-1', steamId: 'steam-user-1' },
       { id: 'user-2', steamId: 'steam-user-2' },
@@ -69,5 +73,36 @@ describe('SteamSnapshotsService', () => {
 
     expect(getOwnedGames).not.toHaveBeenCalled();
     expect(upsert).not.toHaveBeenCalled();
+  });
+
+  it('emite el evento completado con las horas máximas del juego', async () => {
+    findMany.mockResolvedValue([{ id: 'user-1', steamId: 'steam-user-1' }]);
+    getOwnedGames.mockResolvedValue([
+      { appid: 10, name: 'Played', playtime_forever: 6_000 },
+      { appid: 20, name: 'Not played', playtime_forever: 30 },
+    ]);
+
+    await service.takeDailySnapshot();
+
+    expect(emit).toHaveBeenCalledWith(SNAPSHOT_COMPLETED_EVENT, {
+      userId: 'user-1',
+      maxHoursSingleGame: 100,
+    });
+  });
+
+  it('no emite el evento si Steam falla para un usuario', async () => {
+    getOwnedGames
+      .mockRejectedValueOnce(new Error('Steam unavailable'))
+      .mockResolvedValueOnce([
+        { appid: 30, name: 'Played', playtime_forever: 10 },
+      ]);
+
+    await service.takeDailySnapshot();
+
+    expect(emit).toHaveBeenCalledTimes(1);
+    expect(emit).toHaveBeenCalledWith(
+      SNAPSHOT_COMPLETED_EVENT,
+      expect.objectContaining({ userId: 'user-2' }),
+    );
   });
 });

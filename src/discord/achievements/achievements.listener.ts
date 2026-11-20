@@ -1,14 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AchievementsService } from './achievements.service.js';
 import { Client } from 'discord.js';
-import { LEVEL_UP_EVENT, type LevelUpEvent } from './achievements.events.js';
+import {
+  LEVEL_UP_EVENT,
+  SNAPSHOT_COMPLETED_EVENT,
+  type LevelUpEvent,
+  type SnapshotCompletedEvent,
+} from './achievements.events.js';
 import { OnEvent } from '@nestjs/event-emitter';
+import { NotifierService } from '../../notifier/notifier.service.js';
 
 @Injectable()
 export class AchievementsListener {
   constructor(
     private readonly achievementsService: AchievementsService,
     private readonly discordClient: Client,
+    private readonly notifierService: NotifierService,
   ) {}
 
   private readonly logger = new Logger(AchievementsListener.name);
@@ -38,6 +45,28 @@ export class AchievementsListener {
       const errorName = error instanceof Error ? error.name : 'UnknownError';
       this.logger.error(
         `Error occurred while handling level up event: ${errorName}`,
+      );
+    }
+  }
+
+  @OnEvent(SNAPSHOT_COMPLETED_EVENT)
+  async handleSnapshotCompletedEvent(event: SnapshotCompletedEvent) {
+    try {
+      const newAchievements =
+        await this.achievementsService.checkHoursAchievements(
+          event.userId,
+          event.maxHoursSingleGame,
+        );
+      if (newAchievements.length === 0) return;
+
+      await this.notifierService.notifyUser(
+        event.userId,
+        `🎉 Congratulations! You've unlocked the following achievements based on your playtime: ${newAchievements.map((a) => `**${a.name}**`).join(', ')}`,
+      );
+    } catch (error) {
+      const errorName = error instanceof Error ? error.name : 'UnknownError';
+      this.logger.error(
+        `Error occurred while handling snapshot completed event: ${errorName}`,
       );
     }
   }

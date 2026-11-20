@@ -38,7 +38,10 @@ export function buildProfileEmbed(user: User, profile: Profile) {
       { name: 'Skill', value: profile.skill.toString(), inline: true },
       {
         name: `Achievements (${profile.achievements.length}/${ACHIEVEMENTS.length})`,
-        value: profile.achievements.map((achievement) => achievement.emoji).join(' ') || 'None yet',
+        value:
+          profile.achievements
+            .map((achievement) => achievement.emoji)
+            .join(' ') || 'None yet',
         inline: false,
       },
     )

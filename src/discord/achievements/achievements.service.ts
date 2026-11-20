@@ -80,4 +80,40 @@ export class AchievementsService {
       unlockedIds.has(achievement.id),
     );
   }
+
+  async checkHoursAchievements(
+    userId: string,
+    maxHoursSingleGame: number,
+  ): Promise<AchievementDefinition[]> {
+    const userAchievements = await this.prisma.userAchievement.findMany({
+      where: {
+        userId: userId,
+      },
+      select: {
+        achievementId: true,
+      },
+    });
+
+    const unlockedIds = new Set(userAchievements.map((a) => a.achievementId));
+
+    const newAchievements = getNewAchievements(
+      ACHIEVEMENTS,
+      'hours-single-game',
+      maxHoursSingleGame,
+      unlockedIds,
+    );
+
+    if (newAchievements.length === 0) {
+      return [];
+    }
+    await this.prisma.userAchievement.createMany({
+      data: newAchievements.map((achievement) => ({
+        userId,
+        achievementId: achievement.id,
+      })),
+      skipDuplicates: true,
+    });
+
+    return newAchievements;
+  }
 }

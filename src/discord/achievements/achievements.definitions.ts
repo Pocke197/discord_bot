@@ -4,7 +4,7 @@ export type AchievementDefinition = {
   description: string;
   emoji: string;
   scope: 'global' | 'local';
-  metric: string;
+  metric: 'level' | 'hours-single-game';
   threshold: number;
 };
 
