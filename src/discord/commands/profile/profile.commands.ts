@@ -2,9 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Context, Options, SlashCommand } from 'necord';
 import type { SlashCommandContext } from 'necord';
 import { ProfileDto } from './profile.dto.js';
-import { MessageFlags } from 'discord.js';
+import { AttachmentBuilder, MessageFlags } from 'discord.js';
 import { ProfileService } from '../../profile/profile.service.js';
 import { buildProfileEmbed } from '../../embeds/profile/profile.embed.js';
+import { renderProfileCard } from '../../profile-card/profile-card.renderer.js';
 
 @Injectable()
 export class ProfileCommands {
@@ -29,21 +30,42 @@ export class ProfileCommands {
 
     const targetUser = options.user ?? interaction.user;
 
+    await interaction.deferReply();
+
     try {
       const profile = await this.profileService.getProfile(
         targetUser.id,
         interaction.guildId,
       );
-      const embed = buildProfileEmbed(targetUser, profile);
 
-      return await interaction.reply({ embeds: [embed] });
+      try {
+        const buffer = await renderProfileCard({
+          username: targetUser.displayName,
+          avatarUrl: targetUser.displayAvatarURL({
+            extension: 'png',
+            size: 256,
+          }),
+          profile,
+        });
+        const attachment = new AttachmentBuilder(buffer, {
+          name: 'profile.png',
+        });
+
+        return await interaction.editReply({ files: [attachment] });
+      } catch (error) {
+        const errorName = error instanceof Error ? error.name : 'UnknownError';
+        this.logger.error(`Failed to render profile card: ${errorName}`);
+
+        return await interaction.editReply({
+          embeds: [buildProfileEmbed(targetUser, profile)],
+        });
+      }
     } catch (error) {
       const errorName = error instanceof Error ? error.name : 'UnknownError';
-      this.logger.error('Error fetching the profile:', errorName);
+      this.logger.error(`Failed to fetch profile: ${errorName}`);
 
-      return await interaction.reply({
+      return await interaction.editReply({
         content: 'Unable to fetch the profile. Please try again later.',
-        flags: MessageFlags.Ephemeral,
       });
     }
   }
