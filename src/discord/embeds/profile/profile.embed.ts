@@ -5,7 +5,7 @@ import { ACHIEVEMENTS } from '../../achievements/achievements.definitions.js';
 
 const PROGRESS_BAR_LENGTH = 12;
 
-export function buildProfileEmbed(user: User, profile: Profile) {
+export const buildProfileEmbed = (user: User, profile: Profile) => {
   const progress = profile.currentXp / profile.neededXp;
   const filled = Math.floor(progress * PROGRESS_BAR_LENGTH);
   const progressBar = `${'█'.repeat(filled)}${'░'.repeat(
@@ -59,4 +59,4 @@ export function buildProfileEmbed(user: User, profile: Profile) {
   }
 
   return embed;
-}
+};

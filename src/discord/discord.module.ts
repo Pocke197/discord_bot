@@ -14,6 +14,8 @@ import { ProfileModule } from './profile/profile.module.js';
 import { StatsModule } from './stats/stats.module.js';
 import { StatsCommands } from './commands/stats/stats.command.js';
 import { AchievementsModule } from './achievements/achievements.module.js';
+import { RankModule } from './rank/rank.module.js';
+import { RankCommands } from './commands/rank/rank.command.js';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { AchievementsModule } from './achievements/achievements.module.js';
     ProfileModule,
     StatsModule,
     AchievementsModule,
+    RankModule,
   ],
   providers: [
     DiscordUpdate,
@@ -41,6 +44,7 @@ import { AchievementsModule } from './achievements/achievements.module.js';
     GameNightCommands,
     ProfileCommands,
     StatsCommands,
+    RankCommands,
   ],
 })
 export class DiscordModule {}
