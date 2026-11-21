@@ -29,9 +29,7 @@ export class RankScheduler {
     }
 
     try {
-      const channel = await this.client.channels.fetch(
-        channelId,
-      );
+      const channel = await this.client.channels.fetch(channelId);
       if (!channel?.isSendable() || channel.isDMBased()) {
         this.logger.error('The weekly ranking channel is not sendable.');
         return;
