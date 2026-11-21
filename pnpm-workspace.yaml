@@ -3,3 +3,5 @@ allowBuilds:
   '@prisma/engines': false
   necord: false
   prisma: false
+overrides:
+  effect: ^3.22.1
